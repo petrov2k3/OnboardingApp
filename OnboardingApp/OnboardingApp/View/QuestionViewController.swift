@@ -7,6 +7,8 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 protocol QuestionViewControllerProtocol: AnyObject {
     func updateContinueButton(isEnabled: Bool)
@@ -25,6 +27,8 @@ final class QuestionViewController: UIViewController {
     // MARK: - Properties
     
     private let presenter: QuestionPresenter
+    
+    private let disposeBag: DisposeBag = DisposeBag()
     
     // MARK: - Inits
     
@@ -107,7 +111,11 @@ final class QuestionViewController: UIViewController {
     }
     
     private func setupActions() {
-        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
+        btContinue.rx.tap
+            .bind { [weak self] in
+                self?.presenter.didTapContinue()
+            }
+            .disposed(by: disposeBag)
     }
     
     private func configureContinueButton(isEnabled: Bool) {
@@ -120,12 +128,6 @@ final class QuestionViewController: UIViewController {
         } else {
             btContinue.configuration = ButtonConfiguration.defaultWhite(title: title)
         }
-    }
-    
-    // MARK: - Actions
-    
-    @objc private func didTapContinue() {
-        presenter.didTapContinue()
     }
 }
 
