@@ -20,71 +20,12 @@ final class PaywallViewController: UIViewController {
 
     // MARK: - UI
     
-    private let ivOnboarding: UIImageView = {
-        let imageView: UIImageView = UIImageView()
-        
-        imageView.image = UIImage(named: "img_onboarding")
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        
-        return imageView
-    }()
-    
-    private let btClose: UIButton = {
-        let button: UIButton = UIButton(type: .system)
-        
-        let image = UIImage(named: "ic_cancel")
-        button.setImage(image, for: .normal)
-        
-        return button
-    }()
-    
-    private let lbTitle: UILabel = {
-        let label: UILabel = UILabel()
-        
-        label.text = "Discover all\nPremium features"
-        label.font = .systemFont(ofSize: 32, weight: .bold)
-        label.textColor = UIColor(named: "mainTextBlack")
-        label.textAlignment = .left
-        label.numberOfLines = 0
-        
-        return label
-    }()
-
-    private let lbDescription: UILabel = {
-        let label: UILabel = UILabel()
-        
-        label.text = "Try 7 days for free\nthen $6.99 per week, auto-renewable"
-        label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textAlignment = .left
-        label.textColor = UIColor(named: "descriptionTextGray")
-        label.numberOfLines = 0
-        
-        return label
-    }()
-
-    private let btBuy: UIButton = {
-        let button: UIButton = UIButton(type: .system)
-        
-        button.setTitle("Start Now", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        button.backgroundColor = UIColor(named: "buttonBackgroundBlack")
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 28
-        button.clipsToBounds = true
-        
-        return button
-    }()
-    
-    private let legalTextView: UITextView = {
-        let textView: UITextView = UITextView()
-        
-        textView.isEditable = false
-        textView.isScrollEnabled = false
-        textView.backgroundColor = .clear
-        
-        return textView
-    }()
+    private let ivOnboarding: UIImageView = UIImageView()
+    private let btClose: UIButton = UIButton(type: .system)
+    private let lbTitle: UILabel = UILabel()
+    private let lbDescription: UILabel = UILabel()
+    private let btBuy: UIButton = UIButton(type: .system)
+    private let tvLegal: UITextView = UITextView()
     
     // MARK: - Properties
     
@@ -107,6 +48,8 @@ final class PaywallViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        layoutUI()
+        
         setupLegalTextView()
         setupActions()
         
@@ -116,9 +59,37 @@ final class PaywallViewController: UIViewController {
     // MARK: - Private
 
     private func setupUI() {
-        view.backgroundColor = UIColor(named: "mainBackgroundScreen")
+        view.backgroundColor = Theme.Colors.mainBackgroundScreen
         
-        view.addSubviews(ivOnboarding, btClose, lbTitle, lbDescription, btBuy, legalTextView)
+        ivOnboarding.image = Theme.Images.onboarding
+        ivOnboarding.contentMode = .scaleAspectFill
+        ivOnboarding.clipsToBounds = true
+        
+        btClose.setImage(Theme.Icons.close, for: .normal)
+        
+        lbTitle.text = "Discover all\nPremium features"
+        lbTitle.font = Theme.Fonts.title()
+        lbTitle.textColor = Theme.Colors.mainTextBlack
+        lbTitle.textAlignment = .left
+        lbTitle.numberOfLines = 0
+        
+        lbDescription.numberOfLines = 0
+        lbDescription.textAlignment = .left
+        
+        btBuy.setTitle("Start Now", for: .normal)
+        btBuy.titleLabel?.font = Theme.Fonts.body(17, weight: .semibold)
+        btBuy.backgroundColor = Theme.Colors.buttonBackgroundBlack
+        btBuy.setTitleColor(.white, for: .normal)
+        btBuy.layer.cornerRadius = 28
+        btBuy.clipsToBounds = true
+        
+        tvLegal.isEditable = false
+        tvLegal.isScrollEnabled = false
+        tvLegal.backgroundColor = .clear
+    }
+    
+    private func layoutUI() {
+        view.addSubviews(ivOnboarding, btClose, lbTitle, lbDescription, btBuy, tvLegal)
         
         ivOnboarding.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
@@ -141,14 +112,14 @@ final class PaywallViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
-        legalTextView.snp.makeConstraints {
+        tvLegal.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
         }
         
         btBuy.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(legalTextView.snp.top).offset(-20)
+            $0.bottom.equalTo(tvLegal.snp.top).offset(-20)
             $0.height.equalTo(56)
         }
     }
@@ -157,17 +128,11 @@ final class PaywallViewController: UIViewController {
         let priceText = priceText.isEmpty ? "$-" : priceText
         let fullText = "Try 7 days for free\nthen \(priceText) per week, auto-renewable"
 
-        let grayColor = UIColor(named: "descriptionTextGray") ?? .gray
-        let blackColor = UIColor(named: "mainTextBlack") ?? .black
-        
-        let fontRegular = UIFont.systemFont(ofSize: 16, weight: .medium)
-        let fontBold = UIFont.systemFont(ofSize: 16, weight: .bold)
-
         let attributed = NSMutableAttributedString(
             string: fullText,
             attributes: [
-                .font: fontRegular,
-                .foregroundColor: grayColor
+                .font: Theme.Fonts.body(weight: .medium),
+                .foregroundColor: Theme.Colors.descriptionTextGray
             ]
         )
 
@@ -175,8 +140,8 @@ final class PaywallViewController: UIViewController {
         
         if priceRange.location != NSNotFound {
             attributed.addAttributes([
-                .font: fontBold,
-                .foregroundColor: blackColor
+                .font: Theme.Fonts.body(weight: .bold),
+                .foregroundColor: Theme.Colors.mainTextBlack
             ], range: priceRange)
         }
 
@@ -196,10 +161,10 @@ final class PaywallViewController: UIViewController {
     private func setupLegalTextView() {
         let baseText = "By continuing you accept our:\nTerms of Use, Privacy Policy, Subscription Terms"
 
-        let grayColor = UIColor(named: "descriptionTextGray") ?? .gray
-        let linkColor = UIColor(named: "linkTextBlue") ?? .systemBlue
+        let grayColor = Theme.Colors.descriptionTextGray
+        let linkColor = Theme.Colors.linkTextBlue
 
-        let font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        let font = Theme.Fonts.legal()
 
         let attributed = NSMutableAttributedString(
             string: baseText,
@@ -235,10 +200,10 @@ final class PaywallViewController: UIViewController {
             range: NSRange(location: 0, length: attributed.length)
         )
         
-        legalTextView.attributedText = attributed
-        legalTextView.linkTextAttributes = [.foregroundColor: linkColor]
-        legalTextView.textAlignment = .center
-        legalTextView.delegate = self
+        tvLegal.attributedText = attributed
+        tvLegal.linkTextAttributes = [.foregroundColor: linkColor]
+        tvLegal.textAlignment = .center
+        tvLegal.delegate = self
     }
     
     private func setupActions() {

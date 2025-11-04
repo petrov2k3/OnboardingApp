@@ -10,19 +10,19 @@ import UIKit
 enum Theme {
 
     enum Colors {
-        static var background: UIColor {
+        static var mainBackgroundScreen: UIColor {
             UIColor(named: "mainBackgroundScreen") ?? .systemBackground
         }
 
-        static var mainText: UIColor {
+        static var mainTextBlack: UIColor {
             UIColor(named: "mainTextBlack") ?? .label
         }
 
-        static var descriptionText: UIColor {
+        static var descriptionTextGray: UIColor {
             UIColor(named: "descriptionTextGray") ?? .secondaryLabel
         }
 
-        static var buttonBackground: UIColor {
+        static var buttonBackgroundBlack: UIColor {
             UIColor(named: "buttonBackgroundBlack") ?? .black
         }
 
@@ -30,7 +30,7 @@ enum Theme {
             UIColor(named: "buttonTextGray") ?? .lightGray
         }
 
-        static var linkBlue: UIColor {
+        static var linkTextBlue: UIColor {
             UIColor(named: "linkTextBlue") ?? .systemBlue
         }
     }
