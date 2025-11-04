@@ -80,10 +80,13 @@ final class OnboardingFlow {
             return QuestionViewController(presenter: presenter)
 
         case .paywall:
-            let paywallVC = PaywallViewController { [weak self] in
+            let presenter = PaywallPresenter(onClose: { [weak self] in
                 continuation.resume()
                 self?.navigationController?.dismiss(animated: true)
-            }
+            })
+            
+            let paywallVC = PaywallViewController(presenter: presenter)
+            presenter.view = paywallVC
             
             return paywallVC
         }

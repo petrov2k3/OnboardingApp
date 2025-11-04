@@ -81,15 +81,15 @@ final class PaywallViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let onClose: EmptyClosure
+    private let presenter: PaywallPresenterProtocol
     
     // MARK: - Inits
-
-    init(onClose: @escaping EmptyClosure) {
-        self.onClose = onClose
+    
+    init(presenter: PaywallPresenterProtocol) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -100,10 +100,11 @@ final class PaywallViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        setupDescriptionLabel()
+        setupDescriptionLabel(priceText: "$6.99") // TODO: change with receiving from presenter
         setupLegalTextView()
-        
         setupActions()
+        
+        presenter.viewDidLoad()
     }
     
     // MARK: - Private
@@ -146,9 +147,8 @@ final class PaywallViewController: UIViewController {
         }
     }
     
-    private func setupDescriptionLabel() {
-        let fullText = "Try 7 days for free\nthen $6.99 per week, auto-renewable"
-        let priceText = "$6.99" // TODO: receive from subscription.priceString (Product.displayPrice)
+    private func setupDescriptionLabel(priceText: String) {
+        let fullText = "Try 7 days for free\nthen \(priceText) per week, auto-renewable"
 
         let grayColor = UIColor(named: "descriptionTextGray") ?? .gray
         let blackColor = UIColor(named: "mainTextBlack") ?? .black
@@ -251,15 +251,12 @@ final class PaywallViewController: UIViewController {
     
     @objc
     private func buyButtonTapped() {
-        
-        // TODO: add the StoreKit2 purchase
-        
-        onClose()
+        presenter.didTapBuy()
     }
     
     @objc
     private func closeButtonTapped() {
-        onClose()
+        presenter.didTapClose()
     }
 }
 
@@ -283,5 +280,35 @@ extension PaywallViewController: UITextViewDelegate {
         }
         
         return false
+    }
+}
+
+// MARK: - PaywallView
+
+extension PaywallViewController: PaywallView {
+    func updatePriceText(_ priceText: String) {
+        setupDescriptionLabel(priceText: priceText)
+    }
+
+    func setLoading(_ isLoading: Bool) {
+        btBuy.isEnabled = !isLoading
+        // TODO: (maybe) add an activity indicator
+    }
+
+    func setPurchaseButtonEnabled(_ isEnabled: Bool) {
+        btBuy.isEnabled = isEnabled
+        btBuy.alpha = isEnabled ? 1.0 : 0.7
+    }
+
+    func showError(message: String) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        
+        present(alert, animated: true)
     }
 }
