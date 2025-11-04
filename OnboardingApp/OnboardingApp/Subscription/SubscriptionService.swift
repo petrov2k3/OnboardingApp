@@ -12,8 +12,11 @@ protocol SubscriptionServiceProtocol {
     func loadProduct() async throws -> Product
     func purchase(product: Product) async throws -> Transaction?
     
-    ///_ may not use it yet, but the method is ready
+    ///__ may not use it yet, but the methods are ready
     func hasActiveSubscription() async -> Bool
+    
+    ///__ restore methods is good if in the future we will add the Restore button to Paywall screen, as it's recommended by Apple guidelines
+    func restore() async throws
 }
 
 enum SubscriptionError: Error {
@@ -68,7 +71,13 @@ final class SubscriptionService: SubscriptionServiceProtocol {
         }
         return false
     }
-
+    
+    func restore() async throws {
+        for await result in Transaction.currentEntitlements {
+            _ = try checkVerified(result)
+        }
+    }
+    
     // MARK: - Private
 
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
