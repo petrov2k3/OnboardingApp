@@ -202,6 +202,8 @@ final class PaywallViewController: UIViewController {
     }
     
     private func setupActions() {
+        // TODO: refactor with RxSwift
+        
         btBuy.addTarget(self, action: #selector(buyButtonTapped), for: .touchUpInside)
         btClose.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     }
