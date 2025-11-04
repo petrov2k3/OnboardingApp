@@ -45,6 +45,10 @@ final class QuestionViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        layoutUI()
+        
+        setupActions()
+        
         presenter.viewDidLoad()
     }
 
@@ -82,14 +86,16 @@ final class QuestionViewController: UIViewController {
         btContinue.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         btContinue.layer.cornerRadius = 28
         btContinue.clipsToBounds = true
-        configureContinueButton(isEnabled: false)
-        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
         
+        configureContinueButton(isEnabled: false)
+    }
+    
+    private func layoutUI() {
         view.addSubviews(lbTitle, lbQuestion, tvAnswers, continueShadowView)
         continueShadowView.addSubview(btContinue)
         
         lbTitle.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(104)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(60)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
@@ -100,7 +106,7 @@ final class QuestionViewController: UIViewController {
         
         continueShadowView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(82)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(48)
             $0.height.equalTo(56)
         }
         
@@ -113,6 +119,10 @@ final class QuestionViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalTo(continueShadowView.snp.top).offset(-16)
         }
+    }
+    
+    private func setupActions() {
+        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
     }
     
     private func configureContinueButton(isEnabled: Bool) {

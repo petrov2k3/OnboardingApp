@@ -107,7 +107,6 @@ final class PaywallViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        setupDescriptionLabel(priceText: "$6.99") // TODO: change with receiving from presenter
         setupLegalTextView()
         setupActions()
         
@@ -154,7 +153,8 @@ final class PaywallViewController: UIViewController {
         }
     }
     
-    private func setupDescriptionLabel(priceText: String) {
+    private func setupDescriptionLabel(priceText: String = "") {
+        let priceText = priceText.isEmpty ? "$-" : priceText
         let fullText = "Try 7 days for free\nthen \(priceText) per week, auto-renewable"
 
         let grayColor = UIColor(named: "descriptionTextGray") ?? .gray

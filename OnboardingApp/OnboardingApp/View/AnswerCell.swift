@@ -29,7 +29,7 @@ final class AnswerCell: UITableViewCell {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
 
-        containerView.layer.cornerRadius = 18
+        containerView.layer.cornerRadius = 16
         containerView.clipsToBounds = true
         containerView.backgroundColor = .white
 

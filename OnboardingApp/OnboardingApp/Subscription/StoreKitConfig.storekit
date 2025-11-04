@@ -36,7 +36,7 @@
       "localizations" : [
 
       ],
-      "name" : "PremiumSubscriptions",
+      "name" : "Premium Subscriptions",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -63,7 +63,7 @@
           ],
           "productID" : "com.ivanpetrov.OnboardingApp.weekly_premium",
           "recurringSubscriptionPeriod" : "P1W",
-          "referenceName" : "PremiumSubscriptions",
+          "referenceName" : "Premium Weekly",
           "subscriptionGroupID" : "A623005A",
           "type" : "RecurringSubscription",
           "winbackOffers" : [
