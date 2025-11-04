@@ -8,6 +8,8 @@
 import UIKit
 import SnapKit
 import SafariServices
+import RxSwift
+import RxCocoa
 
 protocol PaywallViewControllerProtocol: AnyObject {
     func updatePriceText(_ priceText: String)
@@ -31,6 +33,8 @@ final class PaywallViewController: UIViewController {
     
     private let presenter: PaywallPresenterProtocol
     
+    private let disposeBag: DisposeBag = DisposeBag()
+    
     // MARK: - Inits
     
     init(presenter: PaywallPresenterProtocol) {
@@ -51,7 +55,8 @@ final class PaywallViewController: UIViewController {
         layoutUI()
         
         setupLegalTextView()
-        setupActions()
+        
+        setupBindings()
         
         presenter.viewDidLoad()
     }
@@ -201,11 +206,18 @@ final class PaywallViewController: UIViewController {
         tvLegal.delegate = self
     }
     
-    private func setupActions() {
-        // TODO: refactor with RxSwift
+    private func setupBindings() {
+        btBuy.rx.tap
+            .bind { [weak self] in
+                self?.presenter.didTapBuy()
+            }
+            .disposed(by: disposeBag)
         
-        btBuy.addTarget(self, action: #selector(buyButtonTapped), for: .touchUpInside)
-        btClose.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        btClose.rx.tap
+            .bind { [weak self] in
+                self?.presenter.didTapClose()
+            }
+            .disposed(by: disposeBag)
     }
     
     private func openLinkInsideApp(_ urlString: String) {
@@ -214,18 +226,6 @@ final class PaywallViewController: UIViewController {
         let safariVC = SFSafariViewController(url: url)
         
         present(safariVC, animated: true)
-    }
-
-    // MARK: - Actions
-    
-    @objc
-    private func buyButtonTapped() {
-        presenter.didTapBuy()
-    }
-    
-    @objc
-    private func closeButtonTapped() {
-        presenter.didTapClose()
     }
 }
 
@@ -261,6 +261,7 @@ extension PaywallViewController: PaywallViewControllerProtocol {
 
     func setLoading(_ isLoading: Bool) {
         btBuy.isEnabled = !isLoading
+        
         // TODO: (maybe) add an activity indicator
     }
 
