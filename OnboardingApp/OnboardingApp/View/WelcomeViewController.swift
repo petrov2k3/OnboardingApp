@@ -12,15 +12,7 @@ class WelcomeViewController: UIViewController {
 
     // MARK: - Properties
     
-    private let lbTitle: UILabel = {
-        let label: UILabel = UILabel()
-        
-        label.text = "Welcome!"
-        label.font = .systemFont(ofSize: 32, weight: .bold)
-        label.textAlignment = .center
-        
-        return label
-    }()
+    private let lbTitle: UILabel = UILabel()
 
     // MARK: - Lifecycle
     
@@ -28,14 +20,22 @@ class WelcomeViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        layoutUI()
+        
         startOnboardingFlow()
     }
 
     // MARK: - Private
     
     private func setupUI() {
-        view.backgroundColor = UIColor(named: "mainBackgroundScreen")
+        view.backgroundColor = Theme.Colors.mainBackgroundScreen
 
+        lbTitle.text = "Welcome!"
+        lbTitle.font = Theme.Fonts.title()
+        lbTitle.textAlignment = .center
+    }
+    
+    private func layoutUI() {
         view.addSubview(lbTitle)
 
         lbTitle.snp.makeConstraints {

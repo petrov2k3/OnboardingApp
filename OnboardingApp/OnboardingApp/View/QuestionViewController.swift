@@ -21,7 +21,6 @@ final class QuestionViewController: UIViewController {
     private let lbQuestion: UILabel = UILabel()
     private let tvAnswers: UITableView = UITableView()
     private let btContinue: UIButton = UIButton(type: .system)
-    private let continueShadowView: UIView = UIView()
 
     // MARK: - Properties
     
@@ -45,22 +44,26 @@ final class QuestionViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        layoutUI()
+        
+        setupActions()
+        
         presenter.viewDidLoad()
     }
 
     // MARK: - Private
     
     private func setupUI() {
-        view.backgroundColor = UIColor(named: "mainBackgroundScreen")
+        view.backgroundColor = Theme.Colors.mainBackgroundScreen
 
         lbTitle.text = "Let’s setup App for you"
-        lbTitle.font = .systemFont(ofSize: 26, weight: .bold)
-        lbTitle.textColor = UIColor(named: "mainTextBlack")
+        lbTitle.font = Theme.Fonts.title(26)
+        lbTitle.textColor = Theme.Colors.mainTextBlack
         lbTitle.numberOfLines = 0
         
         lbQuestion.text = presenter.questionTitle
-        lbQuestion.font = .systemFont(ofSize: 20, weight: .semibold)
-        lbQuestion.textColor = UIColor(named: "mainTextBlack")
+        lbQuestion.font = Theme.Fonts.subtitle()
+        lbQuestion.textColor = Theme.Colors.mainTextBlack
         lbQuestion.numberOfLines = 0
         
         tvAnswers.backgroundColor = .clear
@@ -72,24 +75,16 @@ final class QuestionViewController: UIViewController {
         tvAnswers.rowHeight = UITableView.automaticDimension
         tvAnswers.estimatedRowHeight = 52
         
-        continueShadowView.backgroundColor = .clear
-        continueShadowView.layer.shadowColor = UIColor.black.cgColor
-        continueShadowView.layer.shadowOpacity = 0.08
-        continueShadowView.layer.shadowRadius = 16
-        continueShadowView.layer.shadowOffset = CGSize(width: 0, height: 4)
+        btContinue.configuration = ButtonConfiguration.defaultWhite(title: "Continue")
         
-        btContinue.setTitle("Continue", for: .normal)
-        btContinue.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        btContinue.layer.cornerRadius = 28
-        btContinue.clipsToBounds = true
         configureContinueButton(isEnabled: false)
-        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
-        
-        view.addSubviews(lbTitle, lbQuestion, tvAnswers, continueShadowView)
-        continueShadowView.addSubview(btContinue)
+    }
+    
+    private func layoutUI() {
+        view.addSubviews(lbTitle, lbQuestion, tvAnswers, btContinue)
         
         lbTitle.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(104)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(60)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
@@ -98,32 +93,32 @@ final class QuestionViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
-        continueShadowView.snp.makeConstraints {
+        btContinue.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(82)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(48)
             $0.height.equalTo(56)
         }
         
-        btContinue.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
         tvAnswers.snp.makeConstraints {
-            $0.top.equalTo(lbQuestion.snp.bottom).offset(20)
+            $0.top.equalTo(lbQuestion.snp.bottom).offset(14)
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(continueShadowView.snp.top).offset(-16)
+            $0.bottom.equalTo(btContinue.snp.top).offset(-16)
         }
+    }
+    
+    private func setupActions() {
+        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
     }
     
     private func configureContinueButton(isEnabled: Bool) {
         btContinue.isEnabled = isEnabled
         
+        let title = "Continue"
+        
         if isEnabled {
-            btContinue.backgroundColor = UIColor(named: "buttonBackgroundBlack") ?? .black
-            btContinue.setTitleColor(.white, for: .normal)
+            btContinue.configuration = ButtonConfiguration.defaultBlack(title: title)
         } else {
-            btContinue.backgroundColor = .white
-            btContinue.setTitleColor(UIColor(named: "buttonTextGray") ?? .lightGray, for: .normal)
+            btContinue.configuration = ButtonConfiguration.defaultWhite(title: title)
         }
     }
     
