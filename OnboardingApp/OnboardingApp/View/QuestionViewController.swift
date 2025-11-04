@@ -75,10 +75,7 @@ final class QuestionViewController: UIViewController {
         tvAnswers.rowHeight = UITableView.automaticDimension
         tvAnswers.estimatedRowHeight = 52
         
-        btContinue.setTitle("Continue", for: .normal)
-        btContinue.titleLabel?.font = Theme.Fonts.body(17, weight: .semibold)
-        btContinue.layer.cornerRadius = 28
-        btContinue.clipsToBounds = true
+        btContinue.configuration = ButtonConfiguration.defaultWhite(title: "Continue")
         
         configureContinueButton(isEnabled: false)
     }
@@ -103,7 +100,7 @@ final class QuestionViewController: UIViewController {
         }
         
         tvAnswers.snp.makeConstraints {
-            $0.top.equalTo(lbQuestion.snp.bottom).offset(20)
+            $0.top.equalTo(lbQuestion.snp.bottom).offset(14)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalTo(btContinue.snp.top).offset(-16)
         }
@@ -116,12 +113,12 @@ final class QuestionViewController: UIViewController {
     private func configureContinueButton(isEnabled: Bool) {
         btContinue.isEnabled = isEnabled
         
+        let title = "Continue"
+        
         if isEnabled {
-            btContinue.backgroundColor = Theme.Colors.buttonBackgroundBlack
-            btContinue.setTitleColor(.white, for: .normal)
+            btContinue.configuration = ButtonConfiguration.defaultBlack(title: title)
         } else {
-            btContinue.backgroundColor = .white
-            btContinue.setTitleColor(Theme.Colors.buttonTextGray, for: .normal)
+            btContinue.configuration = ButtonConfiguration.defaultWhite(title: title)
         }
     }
     

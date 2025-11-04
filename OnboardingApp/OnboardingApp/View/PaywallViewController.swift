@@ -76,12 +76,7 @@ final class PaywallViewController: UIViewController {
         lbDescription.numberOfLines = 0
         lbDescription.textAlignment = .left
         
-        btBuy.setTitle("Start Now", for: .normal)
-        btBuy.titleLabel?.font = Theme.Fonts.body(17, weight: .semibold)
-        btBuy.backgroundColor = Theme.Colors.buttonBackgroundBlack
-        btBuy.setTitleColor(.white, for: .normal)
-        btBuy.layer.cornerRadius = 28
-        btBuy.clipsToBounds = true
+        btBuy.configuration = ButtonConfiguration.defaultBlack(title: "Start Now")
         
         tvLegal.isEditable = false
         tvLegal.isScrollEnabled = false
@@ -114,7 +109,7 @@ final class PaywallViewController: UIViewController {
         
         tvLegal.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         btBuy.snp.makeConstraints {

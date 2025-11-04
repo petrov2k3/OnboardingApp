@@ -41,7 +41,7 @@ final class AnswerCell: UITableViewCell {
         containerView.addSubview(answerLabel)
 
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0))
+            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 0, bottom: 6, right: 0))
             $0.height.equalTo(52)
         }
 
