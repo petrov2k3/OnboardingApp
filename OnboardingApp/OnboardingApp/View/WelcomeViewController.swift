@@ -34,7 +34,7 @@ class WelcomeViewController: UIViewController {
     // MARK: - Private
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "mainBackgroundScreen")
 
         view.addSubview(lbTitle)
 

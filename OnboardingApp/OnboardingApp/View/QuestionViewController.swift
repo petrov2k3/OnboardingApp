@@ -18,8 +18,10 @@ final class QuestionViewController: UIViewController {
     // MARK: - UI
     
     private let lbTitle: UILabel = UILabel()
+    private let lbQuestion: UILabel = UILabel()
     private let tvAnswers: UITableView = UITableView()
     private let btContinue: UIButton = UIButton(type: .system)
+    private let continueShadowView: UIView = UIView()
 
     // MARK: - Properties
     
@@ -49,39 +51,79 @@ final class QuestionViewController: UIViewController {
     // MARK: - Private
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "mainBackgroundScreen")
 
-        lbTitle.font = .systemFont(ofSize: 22, weight: .bold)
+        lbTitle.text = "Let’s setup App for you"
+        lbTitle.font = .systemFont(ofSize: 26, weight: .bold)
+        lbTitle.textColor = UIColor(named: "mainTextBlack")
         lbTitle.numberOfLines = 0
-        lbTitle.text = presenter.questionTitle
         
+        lbQuestion.text = presenter.questionTitle
+        lbQuestion.font = .systemFont(ofSize: 20, weight: .semibold)
+        lbQuestion.textColor = UIColor(named: "mainTextBlack")
+        lbQuestion.numberOfLines = 0
+        
+        tvAnswers.backgroundColor = .clear
+        tvAnswers.separatorStyle = .none
+        tvAnswers.showsVerticalScrollIndicator = false
         tvAnswers.dataSource = self
         tvAnswers.delegate = self
-
+        tvAnswers.register(AnswerCell.self, forCellReuseIdentifier: AnswerCell.reuseId)
+        tvAnswers.rowHeight = UITableView.automaticDimension
+        tvAnswers.estimatedRowHeight = 52
+        
+        continueShadowView.backgroundColor = .clear
+        continueShadowView.layer.shadowColor = UIColor.black.cgColor
+        continueShadowView.layer.shadowOpacity = 0.08
+        continueShadowView.layer.shadowRadius = 16
+        continueShadowView.layer.shadowOffset = CGSize(width: 0, height: 4)
+        
         btContinue.setTitle("Continue", for: .normal)
-        btContinue.isEnabled = false
-        btContinue.backgroundColor = .lightGray
-        btContinue.setTitleColor(.white, for: .normal)
-        btContinue.layer.cornerRadius = 24
+        btContinue.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        btContinue.layer.cornerRadius = 28
+        btContinue.clipsToBounds = true
+        configureContinueButton(isEnabled: false)
         btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
         
-        view.addSubviews(lbTitle, tvAnswers, btContinue)
+        view.addSubviews(lbTitle, lbQuestion, tvAnswers, continueShadowView)
+        continueShadowView.addSubview(btContinue)
         
         lbTitle.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(104)
+            $0.leading.trailing.equalToSuperview().inset(24)
+        }
+        
+        lbQuestion.snp.makeConstraints {
+            $0.top.equalTo(lbTitle.snp.bottom).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(24)
+        }
+        
+        continueShadowView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(82)
+            $0.height.equalTo(56)
         }
         
         btContinue.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-24)
-            $0.height.equalTo(52)
+            $0.edges.equalToSuperview()
         }
         
         tvAnswers.snp.makeConstraints {
-            $0.top.equalTo(lbTitle.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(btContinue.snp.top).offset(-16)
+            $0.top.equalTo(lbQuestion.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.equalTo(continueShadowView.snp.top).offset(-16)
+        }
+    }
+    
+    private func configureContinueButton(isEnabled: Bool) {
+        btContinue.isEnabled = isEnabled
+        
+        if isEnabled {
+            btContinue.backgroundColor = UIColor(named: "buttonBackgroundBlack") ?? .black
+            btContinue.setTitleColor(.white, for: .normal)
+        } else {
+            btContinue.backgroundColor = .white
+            btContinue.setTitleColor(UIColor(named: "buttonTextGray") ?? .lightGray, for: .normal)
         }
     }
     
@@ -96,8 +138,7 @@ final class QuestionViewController: UIViewController {
 
 extension QuestionViewController: QuestionViewControllerProtocol {
     func updateContinueButton(isEnabled: Bool) {
-        btContinue.isEnabled = isEnabled
-        btContinue.backgroundColor = isEnabled ? .systemGreen : .lightGray
+        configureContinueButton(isEnabled: isEnabled)
     }
 
     func reloadAnswers() {
@@ -114,18 +155,21 @@ extension QuestionViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = presenter.answerText(at: indexPath.row)
-
-        if presenter.selectedIndex == indexPath.row {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: AnswerCell.reuseId,
+            for: indexPath
+        ) as? AnswerCell else {
+            return UITableViewCell()
         }
-
+        
+        let text = presenter.answerText(at: indexPath.row)
+        let isSelected = presenter.selectedIndex == indexPath.row
+        
+        cell.configure(text: text, isSelected: isSelected)
+        
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         presenter.didSelectAnswer(at: indexPath.row)
     }
