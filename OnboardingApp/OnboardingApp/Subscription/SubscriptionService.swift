@@ -11,6 +11,9 @@ import StoreKit
 protocol SubscriptionServiceProtocol {
     func loadProduct() async throws -> Product
     func purchase(product: Product) async throws -> Transaction?
+    
+    ///_ may not use it yet, but the method is ready
+    func hasActiveSubscription() async -> Bool
 }
 
 enum SubscriptionError: Error {
@@ -47,6 +50,23 @@ final class SubscriptionService: SubscriptionServiceProtocol {
         @unknown default:
             return nil
         }
+    }
+    
+    func hasActiveSubscription() async -> Bool {
+        
+        // TODO: here we can decide whether to show the paywall / change the UI
+        
+        for await result in Transaction.currentEntitlements {
+            switch result {
+            case .verified(let transaction):
+                if productIds.contains(transaction.productID) {
+                    return true
+                }
+            case .unverified:
+                continue
+            }
+        }
+        return false
     }
 
     // MARK: - Private

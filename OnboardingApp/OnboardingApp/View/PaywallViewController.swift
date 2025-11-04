@@ -9,6 +9,13 @@ import UIKit
 import SnapKit
 import SafariServices
 
+protocol PaywallViewControllerProtocol: AnyObject {
+    func updatePriceText(_ priceText: String)
+    func setLoading(_ isLoading: Bool)
+    func setPurchaseButtonEnabled(_ isEnabled: Bool)
+    func showError(message: String)
+}
+
 final class PaywallViewController: UIViewController {
 
     // MARK: - UI
@@ -283,9 +290,9 @@ extension PaywallViewController: UITextViewDelegate {
     }
 }
 
-// MARK: - PaywallView
+// MARK: - PaywallViewControllerProtocol
 
-extension PaywallViewController: PaywallView {
+extension PaywallViewController: PaywallViewControllerProtocol {
     func updatePriceText(_ priceText: String) {
         setupDescriptionLabel(priceText: priceText)
     }

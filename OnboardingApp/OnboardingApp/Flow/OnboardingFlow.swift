@@ -86,7 +86,7 @@ final class OnboardingFlow {
             })
             
             let paywallVC = PaywallViewController(presenter: presenter)
-            presenter.view = paywallVC
+            presenter.vc = paywallVC
             
             return paywallVC
         }

@@ -8,13 +8,6 @@
 import Foundation
 import StoreKit
 
-protocol PaywallView: AnyObject {
-    func updatePriceText(_ priceText: String)
-    func setLoading(_ isLoading: Bool)
-    func setPurchaseButtonEnabled(_ isEnabled: Bool)
-    func showError(message: String)
-}
-
 protocol PaywallPresenterProtocol {
     func viewDidLoad()
     func didTapBuy()
@@ -23,7 +16,7 @@ protocol PaywallPresenterProtocol {
 
 final class PaywallPresenter: PaywallPresenterProtocol {
 
-    weak var view: PaywallView?
+    weak var vc: PaywallViewControllerProtocol?
 
     private let subscriptionService: SubscriptionServiceProtocol
     private let onClose: EmptyClosure
@@ -39,8 +32,8 @@ final class PaywallPresenter: PaywallPresenterProtocol {
     }
 
     func viewDidLoad() {
-        view?.setPurchaseButtonEnabled(false)
-        view?.setLoading(true)
+        vc?.setPurchaseButtonEnabled(false)
+        vc?.setLoading(true)
 
         Task {
             await loadProduct()
@@ -50,8 +43,8 @@ final class PaywallPresenter: PaywallPresenterProtocol {
     func didTapBuy() {
         guard let product = product else { return }
 
-        view?.setLoading(true)
-        view?.setPurchaseButtonEnabled(false)
+        vc?.setLoading(true)
+        vc?.setPurchaseButtonEnabled(false)
 
         Task {
             await purchase(product: product)
@@ -64,26 +57,21 @@ final class PaywallPresenter: PaywallPresenterProtocol {
 
     // MARK: - Private
 
-    @MainActor
-    private func handleLoaded(product: Product) {
-        self.product = product
-        view?.setLoading(false)
-        view?.setPurchaseButtonEnabled(true)
-
-        // Product.displayPrice уже содержит валюту, например "$6.99"
-        view?.updatePriceText(product.displayPrice)
-    }
-
     private func loadProduct() async {
         do {
             let product = try await subscriptionService.loadProduct()
+            
             await MainActor.run {
-                self.handleLoaded(product: product)
+                self.product = product
+                self.vc?.setLoading(false)
+                self.vc?.setPurchaseButtonEnabled(true)
+                self.vc?.updatePriceText(product.displayPrice)
             }
+            
         } catch {
             await MainActor.run {
-                self.view?.setLoading(false)
-                self.view?.showError(message: "Failed to load subscription. Please try again.")
+                self.vc?.setLoading(false)
+                self.vc?.showError(message: "Failed to load subscription. Please try again.")
             }
         }
     }
@@ -91,20 +79,20 @@ final class PaywallPresenter: PaywallPresenterProtocol {
     private func purchase(product: Product) async {
         do {
             let transaction = try await subscriptionService.purchase(product: product)
+            
             await MainActor.run {
-                self.view?.setLoading(false)
-                self.view?.setPurchaseButtonEnabled(true)
+                self.vc?.setLoading(false)
+                self.vc?.setPurchaseButtonEnabled(true)
 
                 if transaction != nil {
-                    // покупка успешна — закрываем flow
                     self.onClose()
                 }
             }
         } catch {
             await MainActor.run {
-                self.view?.setLoading(false)
-                self.view?.setPurchaseButtonEnabled(true)
-                self.view?.showError(message: "Purchase failed. Please try again.")
+                self.vc?.setLoading(false)
+                self.vc?.setPurchaseButtonEnabled(true)
+                self.vc?.showError(message: "Purchase failed. Please try again.")
             }
         }
     }
