@@ -25,6 +25,9 @@ enum SubscriptionError: Error {
 }
 
 final class SubscriptionService: SubscriptionServiceProtocol {
+    
+    static let shared: SubscriptionService = SubscriptionService()
+    private init() {}
 
     private let productIds = ["com.ivanpetrov.OnboardingApp.weekly_premium"]
 
@@ -75,6 +78,30 @@ final class SubscriptionService: SubscriptionServiceProtocol {
     func restore() async throws {
         for await result in Transaction.currentEntitlements {
             _ = try checkVerified(result)
+        }
+    }
+    
+    func startObservingTransactionUpdates() {
+        Task.detached { [productIds] in
+            for await result in Transaction.updates {
+                do {
+                    let transaction = try await MainActor.run {
+                        try self.checkVerified(result)
+                    }
+                    
+                    if productIds.contains(transaction.productID) {
+                        
+                        // TODO: Here we can pull NotificationCenter / refresh state
+                        
+                        await transaction.finish()
+                    }
+                } catch {
+                    
+                    // TODO: show alert, for now it's just log
+                    
+                    print("Failed to verify transaction from updates: \(error)")
+                }
+            }
         }
     }
     

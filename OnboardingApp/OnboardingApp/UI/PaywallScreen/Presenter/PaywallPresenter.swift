@@ -24,7 +24,7 @@ final class PaywallPresenter: PaywallPresenterProtocol {
     private var product: Product?
 
     init(
-        subscriptionService: SubscriptionServiceProtocol = SubscriptionService(),
+        subscriptionService: SubscriptionServiceProtocol = SubscriptionService.shared,
         onClose: @escaping EmptyClosure
     ) {
         self.subscriptionService = subscriptionService

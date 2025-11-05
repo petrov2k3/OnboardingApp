@@ -97,7 +97,7 @@ final class PaywallViewController: UIViewController {
         }
         
         btClose.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(8)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.trailing.equalToSuperview().inset(16)
             $0.width.height.equalTo(24)
         }
