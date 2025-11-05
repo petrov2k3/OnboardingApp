@@ -45,6 +45,16 @@ final class OnboardingFlow {
         let questions = try await fetcher.fetchOnboardingQuestions()
         
         steps = questions.map { OnboardingStep.question($0) }
+        
+        // TODO: here we can decide whether to show the paywall / change the UI
+        // use subscriptionService.hasActiveSubscription():
+        
+//        let hasSubscription = await subscriptionService.hasActiveSubscription()
+//        
+//        if !hasSubscription {
+//            steps.append(.paywall)
+//        }
+        
         steps.append(.paywall)
     }
 

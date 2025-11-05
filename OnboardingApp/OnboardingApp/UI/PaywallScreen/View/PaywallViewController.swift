@@ -126,6 +126,9 @@ final class PaywallViewController: UIViewController {
     
     private func setupDescriptionLabel(priceText: String = "") {
         let priceText = priceText.isEmpty ? "$-" : priceText
+        
+        // TODO: receive period from product.subscription?.subscriptionPeriod
+        
         let fullText = "Try 7 days for free\nthen \(priceText) per week, auto-renewable"
 
         let attributed = NSMutableAttributedString(
