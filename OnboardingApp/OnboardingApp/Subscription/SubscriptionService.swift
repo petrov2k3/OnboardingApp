@@ -25,6 +25,9 @@ enum SubscriptionError: Error {
 }
 
 final class SubscriptionService: SubscriptionServiceProtocol {
+    
+    static let shared: SubscriptionService = SubscriptionService()
+    private init() {}
 
     private let productIds = ["com.ivanpetrov.OnboardingApp.weekly_premium"]
 
@@ -46,19 +49,22 @@ final class SubscriptionService: SubscriptionServiceProtocol {
             let transaction = try checkVerified(verificationResult)
             await transaction.finish()
             return transaction
-
-        case .pending, .userCancelled:
+            
+        case .pending:
+            
+            // TODO: show payment pending (maybe loader)
+            
             return nil
-
+            
+        case .userCancelled:
+            return nil
+            
         @unknown default:
             return nil
         }
     }
     
     func hasActiveSubscription() async -> Bool {
-        
-        // TODO: here we can decide whether to show the paywall / change the UI
-        
         for await result in Transaction.currentEntitlements {
             switch result {
             case .verified(let transaction):
@@ -73,8 +79,36 @@ final class SubscriptionService: SubscriptionServiceProtocol {
     }
     
     func restore() async throws {
+        
+        // TODO: call "await AppStore.sync()" here
+        // to explicitly restore purchases across devices
+        
         for await result in Transaction.currentEntitlements {
             _ = try checkVerified(result)
+        }
+    }
+    
+    func startObservingTransactionUpdates() {
+        Task.detached { [productIds] in
+            for await result in Transaction.updates {
+                do {
+                    let transaction = try await MainActor.run {
+                        try self.checkVerified(result)
+                    }
+                    
+                    if productIds.contains(transaction.productID) {
+                        
+                        // TODO: use NotificationCenter / refresh state
+                        
+                        await transaction.finish()
+                    }
+                } catch {
+                    
+                    // TODO: show alert, for now it's just log
+                    
+                    print("Failed to verify transaction from updates: \(error)")
+                }
+            }
         }
     }
     

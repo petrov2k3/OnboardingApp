@@ -97,7 +97,7 @@ final class PaywallViewController: UIViewController {
         }
         
         btClose.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(8)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.trailing.equalToSuperview().inset(16)
             $0.width.height.equalTo(24)
         }
@@ -126,6 +126,9 @@ final class PaywallViewController: UIViewController {
     
     private func setupDescriptionLabel(priceText: String = "") {
         let priceText = priceText.isEmpty ? "$-" : priceText
+        
+        // TODO: receive period from product.subscription?.subscriptionPeriod
+        
         let fullText = "Try 7 days for free\nthen \(priceText) per week, auto-renewable"
 
         let attributed = NSMutableAttributedString(
