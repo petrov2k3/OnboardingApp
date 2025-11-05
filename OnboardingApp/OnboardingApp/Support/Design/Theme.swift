@@ -33,6 +33,10 @@ enum Theme {
         static var linkTextBlue: UIColor {
             UIColor(named: "linkTextBlue") ?? .systemBlue
         }
+        
+        static var selectedCellGreen: UIColor {
+            UIColor(named: "selectedCellGreen") ?? .systemGreen
+        }
     }
 
     enum Images {
