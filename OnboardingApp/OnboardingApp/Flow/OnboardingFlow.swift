@@ -57,6 +57,16 @@ final class OnboardingFlow {
 
             let navigationController = UINavigationController(rootViewController: firstVC)
             navigationController.modalPresentationStyle = .fullScreen
+            
+            /*
+             Prevents user from dismissing the onboarding flow by swipe or gesture.
+             Alternatively, if using, for example, ".pageSheet" instead of ".fullScreen",
+             we could handle user-driven dismissals via "UIAdaptivePresentationControllerDelegate"
+             and call "continuation.resume()" in "presentationControllerDidDismiss(_:)"
+             to properly complete the flow.
+             */
+            navigationController.isModalInPresentation = true
+            
             navigationController.setNavigationBarHidden(true, animated: false)
             
             self.navigationController = navigationController
