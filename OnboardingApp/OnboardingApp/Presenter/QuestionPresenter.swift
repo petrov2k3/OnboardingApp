@@ -8,13 +8,20 @@
 import Foundation
 
 protocol QuestionPresenterProtocol {
+    var selectedIndex: Int? { get }
+    var questionTitle: String { get }
+    var numberOfAnswers: Int { get }
+    
     func viewDidLoad()
     func didSelectAnswer(at index: Int)
     func didTapContinue()
+    func answerText(at index: Int) -> String
 }
 
 final class QuestionPresenter: QuestionPresenterProtocol {
 
+    // MARK: - Properties
+    
     weak var vc: QuestionViewControllerProtocol?
 
     private let question: OnboardingQuestion
@@ -22,18 +29,28 @@ final class QuestionPresenter: QuestionPresenterProtocol {
 
     private(set) var selectedIndex: Int? {
         didSet {
-            vc?.updateContinueButton(isEnabled: selectedIndex != nil)
             vc?.reloadAnswers()
         }
     }
+    
+    var questionTitle: String {
+        question.question
+    }
 
+    var numberOfAnswers: Int {
+        question.answers.count
+    }
+    
+    // MARK: - Inits
+    
     init(question: OnboardingQuestion, onFinish: @escaping EmptyClosure) {
         self.question = question
         self.onFinish = onFinish
     }
+    
+    // MARK: - QuestionPresenterProtocol
 
     func viewDidLoad() {
-        vc?.updateContinueButton(isEnabled: false)
         vc?.reloadAnswers()
     }
 
@@ -47,14 +64,6 @@ final class QuestionPresenter: QuestionPresenterProtocol {
         // TODO: save the answer, send it somewhere, etc
         
         onFinish()
-    }
-
-    var questionTitle: String {
-        question.question
-    }
-
-    var numberOfAnswers: Int {
-        question.answers.count
     }
 
     func answerText(at index: Int) -> String {

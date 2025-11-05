@@ -7,9 +7,10 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 protocol QuestionViewControllerProtocol: AnyObject {
-    func updateContinueButton(isEnabled: Bool)
     func reloadAnswers()
 }
 
@@ -25,6 +26,9 @@ final class QuestionViewController: UIViewController {
     // MARK: - Properties
     
     private let presenter: QuestionPresenter
+    
+    private let disposeBag: DisposeBag = DisposeBag()
+    private let selectedIndexRelay: BehaviorRelay<Int?> = BehaviorRelay<Int?>(value: nil)
     
     // MARK: - Inits
     
@@ -46,7 +50,7 @@ final class QuestionViewController: UIViewController {
         setupUI()
         layoutUI()
         
-        setupActions()
+        setupBindings()
         
         presenter.viewDidLoad()
     }
@@ -76,8 +80,7 @@ final class QuestionViewController: UIViewController {
         tvAnswers.estimatedRowHeight = 52
         
         btContinue.configuration = ButtonConfiguration.defaultWhite(title: "Continue")
-        
-        configureContinueButton(isEnabled: false)
+        btContinue.isEnabled = false
     }
     
     private func layoutUI() {
@@ -106,36 +109,49 @@ final class QuestionViewController: UIViewController {
         }
     }
     
-    private func setupActions() {
-        btContinue.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
-    }
-    
-    private func configureContinueButton(isEnabled: Bool) {
-        btContinue.isEnabled = isEnabled
+    private func setupBindings() {
+        btContinue.rx.tap
+            .bind { [weak self] in
+                self?.presenter.didTapContinue()
+            }
+            .disposed(by: disposeBag)
         
-        let title = "Continue"
+        tvAnswers.rx.itemSelected
+            .map { $0.row }
+            .bind { [weak self] row in
+                guard let self else { return }
+                
+                self.selectedIndexRelay.accept(row)
+                self.presenter.didSelectAnswer(at: row)
+            }
+            .disposed(by: disposeBag)
         
-        if isEnabled {
-            btContinue.configuration = ButtonConfiguration.defaultBlack(title: title)
-        } else {
-            btContinue.configuration = ButtonConfiguration.defaultWhite(title: title)
-        }
-    }
-    
-    // MARK: - Actions
-    
-    @objc private func didTapContinue() {
-        presenter.didTapContinue()
+        let isContinueEnabled = selectedIndexRelay
+            .map { $0 != nil }
+            .distinctUntilChanged()
+            .share(replay: 1)
+        
+        isContinueEnabled
+            .bind(to: btContinue.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        isContinueEnabled
+            .bind { [weak self] enabled in
+                guard let self else { return }
+                
+                let title = "Continue"
+                
+                self.btContinue.configuration = enabled
+                    ? ButtonConfiguration.defaultBlack(title: title)
+                    : ButtonConfiguration.defaultWhite(title: title)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
 // MARK: - QuestionViewControllerProtocol
 
 extension QuestionViewController: QuestionViewControllerProtocol {
-    func updateContinueButton(isEnabled: Bool) {
-        configureContinueButton(isEnabled: isEnabled)
-    }
-
     func reloadAnswers() {
         tvAnswers.reloadData()
     }
@@ -163,9 +179,5 @@ extension QuestionViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(text: text, isSelected: isSelected)
         
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        presenter.didSelectAnswer(at: indexPath.row)
     }
 }
